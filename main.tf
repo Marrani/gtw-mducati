@@ -48,7 +48,7 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   payload_format_version = "2.0"
 }
 
-# Define uma rota para o API Gateway
+# Define a rota para o API Gateway
 resource "aws_apigatewayv2_route" "clientes_route" {
   api_id    = aws_apigatewayv2_api.api.id
   route_key = "POST /clientes"
@@ -74,7 +74,7 @@ resource "aws_apigatewayv2_authorizer" "cognito_authorizer" {
   identity_sources = ["$request.header.Authorization"]
 }
 
-# Atualiza a rota para usar o authorizer
+# Atualiza a rota existente para usar o authorizer
 resource "aws_apigatewayv2_route" "clientes_route_with_auth" {
   api_id            = aws_apigatewayv2_api.api.id
   route_key         = "POST /clientes"
@@ -82,3 +82,4 @@ resource "aws_apigatewayv2_route" "clientes_route_with_auth" {
   authorization_type = "JWT"
   authorizer_id     = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
+
