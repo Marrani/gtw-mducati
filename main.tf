@@ -13,7 +13,7 @@ data "aws_lambda_function" "existing_lambda" {
   function_name = "lambda-compradores-CadastrarClienteFunction"
 }
 
-# Role para a função Lambda
+# Define a role para a função Lambda
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda_exec_role"
 
@@ -48,20 +48,6 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   payload_format_version = "2.0"
 }
 
-# Define a rota para o API Gateway
-resource "aws_apigatewayv2_route" "clientes_route" {
-  api_id    = aws_apigatewayv2_api.api.id
-  route_key = "POST /clientes"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
-}
-
-# Define um stage para o API Gateway
-resource "aws_apigatewayv2_stage" "default" {
-  api_id      = aws_apigatewayv2_api.api.id
-  name        = "$default"
-  auto_deploy = true
-}
-
 # Define um authorizer para o API Gateway
 resource "aws_apigatewayv2_authorizer" "cognito_authorizer" {
   api_id            = aws_apigatewayv2_api.api.id
@@ -83,3 +69,9 @@ resource "aws_apigatewayv2_route" "clientes_route_with_auth" {
   authorizer_id     = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
+# Define o stage para o API Gateway
+resource "aws_apigatewayv2_stage" "default" {
+  api_id      = aws_apigatewayv2_api.api.id
+  name        = "$default"
+  auto_deploy = true
+}
