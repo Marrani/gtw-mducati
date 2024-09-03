@@ -13,7 +13,8 @@ data "aws_lambda_function" "existing_lambda" {
   function_name = "lambda-compradores-CadastrarClienteFunction"
 }
 
-# Define uma role para a função Lambda
+# Role para a função Lambda
+# Use uma role existente ou altere o nome se precisar criar uma nova
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda_exec_role"
 
@@ -71,6 +72,7 @@ resource "aws_apigatewayv2_authorizer" "cognito_authorizer" {
     audience = ["550nrvhdi1rs6dpnluakmi1mdh"]
     issuer   = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_WhT5Isndg"
   }
+  identity_source = ["$request.header.Authorization"]
 }
 
 # Atualiza a rota para usar o authorizer
