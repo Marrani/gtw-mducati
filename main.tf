@@ -14,7 +14,6 @@ data "aws_lambda_function" "existing_lambda" {
 }
 
 # Role para a função Lambda
-# Use uma role existente ou altere o nome se precisar criar uma nova
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda_exec_role"
 
@@ -65,21 +64,21 @@ resource "aws_apigatewayv2_stage" "default" {
 
 # Define um authorizer para o API Gateway
 resource "aws_apigatewayv2_authorizer" "cognito_authorizer" {
-  api_id        = aws_apigatewayv2_api.api.id
-  authorizer_type = "JWT"
-  name          = "cognito_authorizer"
+  api_id            = aws_apigatewayv2_api.api.id
+  authorizer_type   = "JWT"
+  name              = "cognito_authorizer"
   jwt_configuration {
     audience = ["550nrvhdi1rs6dpnluakmi1mdh"]
     issuer   = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_WhT5Isndg"
   }
-  identity_source = ["$request.header.Authorization"]
+  identity_sources = ["$request.header.Authorization"]
 }
 
 # Atualiza a rota para usar o authorizer
 resource "aws_apigatewayv2_route" "clientes_route_with_auth" {
-  api_id    = aws_apigatewayv2_api.api.id
-  route_key = "POST /clientes"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+  api_id            = aws_apigatewayv2_api.api.id
+  route_key         = "POST /clientes"
+  target            = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
   authorization_type = "JWT"
-  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
+  authorizer_id     = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
