@@ -4,7 +4,7 @@ provider "aws" {
 
 # Define a API Gateway v2
 resource "aws_apigatewayv2_api" "api" {
-  name          = "MyAPI"
+  name          = "gtw-mducati"
   protocol_type = "HTTP"
 }
 
