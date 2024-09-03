@@ -2,47 +2,62 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_apigatewayv2_api" "http_api" {
-  name          = "gtw-mducati"
+resource "aws_apigatewayv2_api" "api" {
+  name          = "MyAPI"
   protocol_type = "HTTP"
 }
 
-resource "aws_apigatewayv2_authorizer" "jwt_authorizer" {
-  api_id   = aws_apigatewayv2_api.http_api.id
-  name     = "teste"
-  identity_sources = ["$request.header.Authorization"]
-
-  jwt_configuration {
-    audience = ["550nrvhdi1rs6dpnluakmi1mdh"]
-    issuer   = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_WhT5Isndg"
-  }
-
-  authorizer_type = "JWT"
+resource "aws_lambda_function" "lambda" {
+  function_name = "my_lambda_function"
+  handler       = "index.handler"
+  runtime       = "python3.9"
+  
+  # Código da Lambda
+  filename = "lambda_function_payload.zip"
+  
+  role = aws_iam_role.lambda_exec.arn
 }
 
-resource "aws_lambda_permission" "api_gateway_lambda" {
+resource "aws_iam_role" "lambda_exec" {
+  name = "lambda_exec_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_lambda_permission" "apigw_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = "arn:aws:lambda:us-east-1:360478535176:function:lambda-compradores-CadastrarClienteFunction"
+  function_name = aws_lambda_function.lambda.function_name
   principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*"
 }
 
 resource "aws_apigatewayv2_integration" "lambda_integration" {
-  api_id             = aws_apigatewayv2_api.http_api.id
-  integration_type   = "AWS_PROXY"
-  integration_uri    = "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:360478535176:function:lambda-compradores-CadastrarClienteFunction-amp3BkCEiwfI/invocations"
+  api_id           = aws_apigatewayv2_api.api.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.lambda.invoke_arn
   integration_method = "POST"
 }
 
 resource "aws_apigatewayv2_route" "clientes_route" {
-  api_id    = aws_apigatewayv2_api.http_api.id
+  api_id    = aws_apigatewayv2_api.api.id
   route_key = "POST /clientes"
-  target    = aws_apigatewayv2_integration.lambda_integration.id
-  authorizer_id = aws_apigatewayv2_authorizer.jwt_authorizer.id
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
-resource "aws_apigatewayv2_stage" "prod_stage" {
-  api_id      = aws_apigatewayv2_api.http_api.id
-  name        = "prod"
+resource "aws_apigatewayv2_stage" "default" {
+  api_id      = aws_apigatewayv2_api.api.id
+  name        = "$default"
   auto_deploy = true
 }
