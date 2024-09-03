@@ -33,7 +33,7 @@ resource "aws_iam_role" "lambda_exec" {
 
 # Permissão para o API Gateway invocar a função Lambda
 resource "aws_lambda_permission" "apigw_lambda" {
-  statement_id  = "AllowAPIGatewayInvoke"
+  statement_id  = "AllowAPIGatewayInvoke-${timestamp()}"
   action        = "lambda:InvokeFunction"
   function_name = data.aws_lambda_function.existing_lambda.function_name
   principal     = "apigateway.amazonaws.com"
