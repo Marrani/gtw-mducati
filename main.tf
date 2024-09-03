@@ -46,8 +46,3 @@ resource "aws_apigatewayv2_stage" "prod_stage" {
   name        = "prod"
   auto_deploy = true
 }
-
-output "api_endpoint" {
-  description = "URL do API Gateway"
-  value       = aws_apigatewayv2_api.http_api.api_endpoint
-}
