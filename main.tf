@@ -34,7 +34,7 @@ data "aws_lambda_function" "reservar_veiculo_lambda" {
 }
 
 data "aws_lambda_function" "processar_pagamento_lambda" {
-  function_name = "lambda-pagamentos-ProcessarPagamentoFunction"
+  function_name = "ProcessarPagamentoFunction"
 }
 
 # Define a role para a função Lambda
