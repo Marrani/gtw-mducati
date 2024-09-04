@@ -8,9 +8,33 @@ resource "aws_apigatewayv2_api" "api" {
   protocol_type = "HTTP"
 }
 
-# Referencia uma função Lambda existente
-data "aws_lambda_function" "existing_lambda" {
+# Referencia funções Lambda existentes
+data "aws_lambda_function" "cadastrar_cliente_lambda" {
   function_name = "lambda-compradores-CadastrarClienteFunction"
+}
+
+data "aws_lambda_function" "criar_veiculo_lambda" {
+  function_name = "lambda-veiculos-CriarVeiculoFunction"
+}
+
+data "aws_lambda_function" "editar_veiculo_lambda" {
+  function_name = "lambda-veiculos-EditarVeiculoFunction"
+}
+
+data "aws_lambda_function" "listar_disponiveis_lambda" {
+  function_name = "lambda-veiculos-ListarVeiculosDisponiveisFunction"
+}
+
+data "aws_lambda_function" "listar_vendidos_lambda" {
+  function_name = "lambda-veiculos-ListarVeiculosVendidosFunction"
+}
+
+data "aws_lambda_function" "reservar_veiculo_lambda" {
+  function_name = "lambda-veiculos-ReservarVeiculoFunction"
+}
+
+data "aws_lambda_function" "processar_pagamento_lambda" {
+  function_name = "lambda-pagamentos-ProcessarPagamentoFunction"
 }
 
 # Define a role para a função Lambda
@@ -31,20 +55,125 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
-# Permissão para o API Gateway invocar a função Lambda
-resource "aws_lambda_permission" "apigw_lambda" {
+# Permissão para o API Gateway invocar as funções Lambda
+resource "aws_lambda_permission" "apigw_lambda_cadastrar_cliente" {
   statement_id  = "AllowAPIGatewayInvoke-${uuid()}"
   action        = "lambda:InvokeFunction"
-  function_name = data.aws_lambda_function.existing_lambda.function_name
+  function_name = data.aws_lambda_function.cadastrar_cliente_lambda.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
 }
 
-# Define a integração entre o API Gateway e a função Lambda
-resource "aws_apigatewayv2_integration" "lambda_integration" {
-  api_id           = aws_apigatewayv2_api.api.id
-  integration_type = "AWS_PROXY"
-  integration_uri  = data.aws_lambda_function.existing_lambda.invoke_arn
+resource "aws_lambda_permission" "apigw_lambda_criar_veiculo" {
+  statement_id  = "AllowAPIGatewayInvoke-${uuid()}"
+  action        = "lambda:InvokeFunction"
+  function_name = data.aws_lambda_function.criar_veiculo_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_lambda_editar_veiculo" {
+  statement_id  = "AllowAPIGatewayInvoke-${uuid()}"
+  action        = "lambda:InvokeFunction"
+  function_name = data.aws_lambda_function.editar_veiculo_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_lambda_listar_disponiveis" {
+  statement_id  = "AllowAPIGatewayInvoke-${uuid()}"
+  action        = "lambda:InvokeFunction"
+  function_name = data.aws_lambda_function.listar_disponiveis_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_lambda_listar_vendidos" {
+  statement_id  = "AllowAPIGatewayInvoke-${uuid()}"
+  action        = "lambda:InvokeFunction"
+  function_name = data.aws_lambda_function.listar_vendidos_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_lambda_reservar_veiculo" {
+  statement_id  = "AllowAPIGatewayInvoke-${uuid()}"
+  action        = "lambda:InvokeFunction"
+  function_name = data.aws_lambda_function.reservar_veiculo_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_lambda_processar_pagamento" {
+  statement_id  = "AllowAPIGatewayInvoke-${uuid()}"
+  action        = "lambda:InvokeFunction"
+  function_name = data.aws_lambda_function.processar_pagamento_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_lambda_baixar_estoque" {
+  statement_id  = "AllowAPIGatewayInvoke-${uuid()}"
+  action        = "lambda:InvokeFunction"
+  function_name = data.aws_lambda_function.baixar_estoque_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+}
+
+# Define a integração entre o API Gateway e as funções Lambda
+resource "aws_apigatewayv2_integration" "lambda_integration_cadastrar_cliente" {
+  api_id                = aws_apigatewayv2_api.api.id
+  integration_type      = "AWS_PROXY"
+  integration_uri       = data.aws_lambda_function.cadastrar_cliente_lambda.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "lambda_integration_criar_veiculo" {
+  api_id                = aws_apigatewayv2_api.api.id
+  integration_type      = "AWS_PROXY"
+  integration_uri       = data.aws_lambda_function.criar_veiculo_lambda.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "lambda_integration_editar_veiculo" {
+  api_id                = aws_apigatewayv2_api.api.id
+  integration_type      = "AWS_PROXY"
+  integration_uri       = data.aws_lambda_function.editar_veiculo_lambda.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "lambda_integration_listar_disponiveis" {
+  api_id                = aws_apigatewayv2_api.api.id
+  integration_type      = "AWS_PROXY"
+  integration_uri       = data.aws_lambda_function.listar_disponiveis_lambda.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "lambda_integration_listar_vendidos" {
+  api_id                = aws_apigatewayv2_api.api.id
+  integration_type      = "AWS_PROXY"
+  integration_uri       = data.aws_lambda_function.listar_vendidos_lambda.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "lambda_integration_reservar_veiculo" {
+  api_id                = aws_apigatewayv2_api.api.id
+  integration_type      = "AWS_PROXY"
+  integration_uri       = data.aws_lambda_function.reservar_veiculo_lambda.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "lambda_integration_processar_pagamento" {
+  api_id                = aws_apigatewayv2_api.api.id
+  integration_type      = "AWS_PROXY"
+  integration_uri       = data.aws_lambda_function.processar_pagamento_lambda.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "lambda_integration_baixar_estoque" {
+  api_id                = aws_apigatewayv2_api.api.id
+  integration_type      = "AWS_PROXY"
+  integration_uri       = data.aws_lambda_function.baixar_estoque_lambda.invoke_arn
   payload_format_version = "2.0"
 }
 
@@ -60,18 +189,62 @@ resource "aws_apigatewayv2_authorizer" "cognito_authorizer" {
   identity_sources = ["$request.header.Authorization"]
 }
 
-# Atualiza a rota existente para usar o authorizer
+# Define as rotas com autorização JWT
 resource "aws_apigatewayv2_route" "clientes_route_with_auth" {
   api_id            = aws_apigatewayv2_api.api.id
   route_key         = "POST /clientes"
-  target            = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+  target            = "integrations/${aws_apigatewayv2_integration.lambda_integration_cadastrar_cliente.id}"
   authorization_type = "JWT"
   authorizer_id     = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
-# Define o stage para o API Gateway
-resource "aws_apigatewayv2_stage" "default" {
+resource "aws_apigatewayv2_route" "criar_veiculo_route_with_auth" {
+  api_id            = aws_apigatewayv2_api.api.id
+  route_key         = "POST /veiculos"
+  target            = "integrations/${aws_apigatewayv2_integration.lambda_integration_criar_veiculo.id}"
+  authorization_type = "JWT"
+  authorizer_id     = aws_apigatewayv2_authorizer.cognito_authorizer.id
+}
+
+resource "aws_apigatewayv2_route" "editar_veiculo_route_with_auth" {
+  api_id            = aws_apigatewayv2_api.api.id
+  route_key         = "PUT /veiculos/{id}"
+  target            = "integrations/${aws_apigatewayv2_integration.lambda_integration_editar_veiculo.id}"
+  authorization_type = "JWT"
+  authorizer_id     = aws_apigatewayv2_authorizer.cognito_authorizer.id
+}
+
+resource "aws_apigatewayv2_route" "listar_disponiveis_route" {
+  api_id            = aws_apigatewayv2_api.api.id
+  route_key         = "GET /veiculos/disponiveis"
+  target            = "integrations/${aws_apigatewayv2_integration.lambda_integration_listar_disponiveis.id}"
+}
+
+resource "aws_apigatewayv2_route" "listar_vendidos_route" {
+  api_id            = aws_apigatewayv2_api.api.id
+  route_key         = "GET /veiculos/vendidos"
+  target            = "integrations/${aws_apigatewayv2_integration.lambda_integration_listar_vendidos.id}"
+}
+
+resource "aws_apigatewayv2_route" "reservar_veiculo_route_with_auth" {
+  api_id            = aws_apigatewayv2_api.api.id
+  route_key         = "POST /veiculos/{id}/reservar"
+  target            = "integrations/${aws_apigatewayv2_integration.lambda_integration_reservar_veiculo.id}"
+  authorization_type = "JWT"
+  authorizer_id     = aws_apigatewayv2_authorizer.cognito_authorizer.id
+}
+
+resource "aws_apigatewayv2_route" "processar_pagamento_route_with_auth" {
+  api_id            = aws_apigatewayv2_api.api.id
+  route_key         = "POST /pagamentos"
+  target            = "integrations/${aws_apigatewayv2_integration.lambda_integration_processar_pagamento.id}"
+  authorization_type = "JWT"
+  authorizer_id     = aws_apigatewayv2_authorizer.cognito_authorizer.id
+}
+
+# Define o deployment da API
+resource "aws_apigatewayv2_stage" "api_stage" {
   api_id      = aws_apigatewayv2_api.api.id
-  name        = "$default"
+  name        = "dev"
   auto_deploy = true
 }
