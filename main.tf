@@ -112,14 +112,6 @@ resource "aws_lambda_permission" "apigw_lambda_processar_pagamento" {
   source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
 }
 
-resource "aws_lambda_permission" "apigw_lambda_baixar_estoque" {
-  statement_id  = "AllowAPIGatewayInvoke-${uuid()}"
-  action        = "lambda:InvokeFunction"
-  function_name = data.aws_lambda_function.baixar_estoque_lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
-}
-
 # Define a integração entre o API Gateway e as funções Lambda
 resource "aws_apigatewayv2_integration" "lambda_integration_cadastrar_cliente" {
   api_id                = aws_apigatewayv2_api.api.id
@@ -167,13 +159,6 @@ resource "aws_apigatewayv2_integration" "lambda_integration_processar_pagamento"
   api_id                = aws_apigatewayv2_api.api.id
   integration_type      = "AWS_PROXY"
   integration_uri       = data.aws_lambda_function.processar_pagamento_lambda.invoke_arn
-  payload_format_version = "2.0"
-}
-
-resource "aws_apigatewayv2_integration" "lambda_integration_baixar_estoque" {
-  api_id                = aws_apigatewayv2_api.api.id
-  integration_type      = "AWS_PROXY"
-  integration_uri       = data.aws_lambda_function.baixar_estoque_lambda.invoke_arn
   payload_format_version = "2.0"
 }
 
