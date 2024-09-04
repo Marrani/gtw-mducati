@@ -14,23 +14,23 @@ data "aws_lambda_function" "cadastrar_cliente_lambda" {
 }
 
 data "aws_lambda_function" "criar_veiculo_lambda" {
-  function_name = "lambda-veiculos-CriarVeiculoFunction"
+  function_name = "CriarVeiculoFunction"
 }
 
 data "aws_lambda_function" "editar_veiculo_lambda" {
-  function_name = "lambda-veiculos-EditarVeiculoFunction"
+  function_name = "EditarVeiculoFunction"
 }
 
 data "aws_lambda_function" "listar_disponiveis_lambda" {
-  function_name = "lambda-veiculos-ListarVeiculosDisponiveisFunction"
+  function_name = "ListarVeiculosDisponiveisFunction"
 }
 
 data "aws_lambda_function" "listar_vendidos_lambda" {
-  function_name = "lambda-veiculos-ListarVeiculosVendidosFunction"
+  function_name = "ListarVeiculosVendidosFunction"
 }
 
 data "aws_lambda_function" "reservar_veiculo_lambda" {
-  function_name = "lambda-veiculos-ReservarVeiculoFunction"
+  function_name = "ReservarVeiculoFunction"
 }
 
 data "aws_lambda_function" "processar_pagamento_lambda" {
